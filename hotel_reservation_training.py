@@ -1,6 +1,8 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
 
 # Random seed for my project and test data is 20%
 RANDOM_STATE_VALUE = 867
@@ -49,9 +51,12 @@ hotel_reservations_data = hotel_reservations_data.drop(columns=["Booking_ID"])
 # Hotel reservation features
 X = hotel_reservations_data[FEATURES]
 
-# Transform booking status target into 0 and 1. 
-label_encoder = LabelEncoder()
-y = label_encoder.fit_transform(hotel_reservations_data[TARGET])
+# Transform booking status target into 0 and 1
+booking_status_code = {
+    "Not_Canceled": 0,
+    "Canceled": 1,
+}
+y = hotel_reservations_data[TARGET].map(booking_status_code)
 
 # Split input dataset into training and test sets.
 X_train, X_test, y_train, y_test = train_test_split(X, 
@@ -74,6 +79,26 @@ print("Training rows:", len(X_train))
 print("Testing rows:", len(X_test))
 
 
+
+# Feature preprocessing - Scaling numeric columns and One-hot encode categorical columns
+data_preprocessor = ColumnTransformer(
+    transformers=[
+        ("numeric_scaling", StandardScaler(), NUMERIC_FEATURES),
+        (
+            "categorical_one_hot",
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+            CATEGORICAL_FEATURES,
+        ),
+    ]
+)
+
+
+# Fit preprocessor using training data and Transform train and test data
+data_preprocessor.fit(X_train)
+X_train_prep = data_preprocessor.transform(X_train)
+X_test_prep = data_preprocessor.transform(X_test)
+print("Training features shape after preprocessing:", X_train_prep.shape)
+print("Testing features shape after preprocessing:", X_test_prep.shape)
 
 
 
