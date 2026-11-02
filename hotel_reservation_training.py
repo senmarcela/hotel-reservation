@@ -14,6 +14,7 @@ from sklearn.metrics import (
 )
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
 
 
 # Random seed for my project and test data is 20%
@@ -214,5 +215,37 @@ print("F1       :", round(knn_f1, 4))
 print("MCC      :", round(knn_mcc, 4))
 print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
 print(knn_confusion)
+
+
+
+# 4. Naive Bayes - GaussianNB
+naive_bayes_model = GaussianNB()
+# train the model
+naive_bayes_model.fit(X_train_prep, y_train)
+# predict class labels on test data
+naive_bayes_test_predictions = naive_bayes_model.predict(X_test_prep)
+# predict probabilities for target cancelled class
+naive_bayes_test_probabilities = naive_bayes_model.predict_proba(X_test_prep)[:, 1]
+
+
+# Evaluation metrics
+naive_bayes_accuracy = accuracy_score(y_test, naive_bayes_test_predictions)
+naive_bayes_auc = roc_auc_score(y_test, naive_bayes_test_probabilities)
+naive_bayes_precision = precision_score(y_test, naive_bayes_test_predictions, zero_division=0)
+naive_bayes_recall = recall_score(y_test, naive_bayes_test_predictions, zero_division=0)
+naive_bayes_f1 = f1_score(y_test, naive_bayes_test_predictions, zero_division=0)
+naive_bayes_mcc = matthews_corrcoef(y_test, naive_bayes_test_predictions)
+naive_bayes_confusion = confusion_matrix(y_test, naive_bayes_test_predictions)
+
+
+print("----- Naive Bayes results -----")
+print("Accuracy :", round(naive_bayes_accuracy, 4))
+print("AUC      :", round(naive_bayes_auc, 4))
+print("Precision:", round(naive_bayes_precision, 4))
+print("Recall   :", round(naive_bayes_recall, 4))
+print("F1       :", round(naive_bayes_f1, 4))
+print("MCC      :", round(naive_bayes_mcc, 4))
+print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
+print(naive_bayes_confusion)
 
 
