@@ -18,6 +18,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
 
+from pathlib import Path
+import joblib
 
 # Random seed for my project and test data is 20%
 RANDOM_STATE_VALUE = 867
@@ -282,3 +284,57 @@ print("F1       :", round(svm_f1, 4))
 print("MCC      :", round(svm_mcc, 4))
 print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
 print(svm_confusion)
+
+
+
+# Convert booking status back to original value and Save test data
+number_to_booking_status = {
+    0: "Not_Canceled",
+    1: "Canceled",
+}
+
+test_data_export = X_test.copy()
+test_data_export["booking_status"] = pd.Series(y_test).map(number_to_booking_status).values
+test_data_export.to_csv("test_data.csv", index=False)
+
+
+
+# Directory to save model details
+model_output_folder = Path("model")
+model_output_folder.mkdir(parents=True, exist_ok=True)
+
+# Save models into directory
+joblib.dump(data_preprocessor, model_output_folder / "data_preprocessor.joblib")
+joblib.dump(logistic_regression_model, model_output_folder / "logistic_regression.joblib")
+joblib.dump(decision_tree_model, model_output_folder / "decision_tree.joblib")
+joblib.dump(knn_model, model_output_folder / "knn.joblib")
+joblib.dump(naive_bayes_model, model_output_folder / "naive_bayes.joblib")
+joblib.dump(svm_model, model_output_folder / "support_vector_machine.joblib")
+
+
+
+# Save training metadata
+training_meta_info = {
+    "target": "booking_status",
+    "encoding": {
+        "Not_Canceled": 0,
+        "Canceled": 1,
+    },
+    "class_names": ["Not_Canceled", "Canceled"],
+    "numeric_features": NUMERIC_FEATURES,
+    "categorical_features": CATEGORICAL_FEATURES,
+    "feature": FEATURES,
+    "model_files": {
+        "Logistic Regression": "logistic_regression.joblib",
+        "Decision Tree": "decision_tree.joblib",
+        "KNN": "knn.joblib",
+        "Naive Bayes": "naive_bayes.joblib",
+        "Support Vector Machine": "support_vector_machine.joblib",
+    },
+    "preprocessor_file": "data_preprocessor.joblib",
+}
+joblib.dump(training_meta_info, model_output_folder / "meta.joblib")
+
+print(f"Saved files in {model_output_folder} folder")
+print("Saved test_data.csv")
+
