@@ -13,7 +13,7 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 from sklearn.tree import DecisionTreeClassifier
-
+from sklearn.neighbors import KNeighborsClassifier
 
 
 # Random seed for my project and test data is 20%
@@ -181,5 +181,38 @@ print("F1       :", round(decision_tree_f1, 4))
 print("MCC      :", round(decision_tree_mcc, 4))
 print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
 print(decision_tree_confusion)
+
+
+
+# 3. K-Nearest Neighbors
+knn_model = KNeighborsClassifier(n_neighbors=7, weights="distance")
+
+# train the model
+knn_model.fit(X_train_prep, y_train)
+# predict class labels on test data
+knn_test_predictions = knn_model.predict(X_test_prep)
+# predict probabilities for target cancelled class
+knn_test_probabilities = knn_model.predict_proba(X_test_prep)[:, 1]
+
+
+# Evaluation metrics
+knn_accuracy = accuracy_score(y_test, knn_test_predictions)
+knn_auc = roc_auc_score(y_test, knn_test_probabilities)
+knn_precision = precision_score(y_test, knn_test_predictions, zero_division=0)
+knn_recall = recall_score(y_test, knn_test_predictions, zero_division=0)
+knn_f1 = f1_score(y_test, knn_test_predictions, zero_division=0)
+knn_mcc = matthews_corrcoef(y_test, knn_test_predictions)
+knn_confusion = confusion_matrix(y_test, knn_test_predictions)
+
+
+print("----- KNN results -----")
+print("Accuracy :", round(knn_accuracy, 4))
+print("AUC      :", round(knn_auc, 4))
+print("Precision:", round(knn_precision, 4))
+print("Recall   :", round(knn_recall, 4))
+print("F1       :", round(knn_f1, 4))
+print("MCC      :", round(knn_mcc, 4))
+print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
+print(knn_confusion)
 
 
