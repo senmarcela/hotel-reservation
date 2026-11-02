@@ -12,6 +12,9 @@ from sklearn.metrics import (
     matthews_corrcoef,
     confusion_matrix,
 )
+from sklearn.tree import DecisionTreeClassifier
+
+
 
 # Random seed for my project and test data is 20%
 RANDOM_STATE_VALUE = 867
@@ -110,7 +113,7 @@ print("Training features shape after preprocessing:", X_train_prep.shape)
 print("Testing features shape after preprocessing:", X_test_prep.shape)
 
 
-# Logistic Regression
+# 1. Logistic Regression
 logistic_regression_model = LogisticRegression(
     max_iter=2000,
     random_state=RANDOM_STATE_VALUE,
@@ -142,5 +145,41 @@ print("F1       :", round(logistic_regression_f1, 4))
 print("MCC      :", round(logistic_regression_mcc, 4))
 print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
 print(logistic_regression_confusion)
+
+
+
+# 2. Decision Tree
+decision_tree_model = DecisionTreeClassifier(
+    max_depth=12,
+    min_samples_leaf=20,
+    random_state=RANDOM_STATE_VALUE,
+)
+
+# train the model
+decision_tree_model.fit(X_train_prep, y_train)
+# predict class labels on test data
+decision_tree_test_predictions = decision_tree_model.predict(X_test_prep)
+# predict probabilities for target cancelled class
+decision_tree_test_probabilities = decision_tree_model.predict_proba(X_test_prep)[:, 1]
+
+
+# Evaluation metrics
+decision_tree_accuracy = accuracy_score(y_test, decision_tree_test_predictions)
+decision_tree_auc = roc_auc_score(y_test, decision_tree_test_probabilities)
+decision_tree_precision = precision_score(y_test, decision_tree_test_predictions, zero_division=0)
+decision_tree_recall = recall_score(y_test, decision_tree_test_predictions, zero_division=0)
+decision_tree_f1 = f1_score(y_test, decision_tree_test_predictions, zero_division=0)
+decision_tree_mcc = matthews_corrcoef(y_test, decision_tree_test_predictions)
+decision_tree_confusion = confusion_matrix(y_test, decision_tree_test_predictions)
+
+print("----- Decision Tree results -----")
+print("Accuracy :", round(decision_tree_accuracy, 4))
+print("AUC      :", round(decision_tree_auc, 4))
+print("Precision:", round(decision_tree_precision, 4))
+print("Recall   :", round(decision_tree_recall, 4))
+print("F1       :", round(decision_tree_f1, 4))
+print("MCC      :", round(decision_tree_mcc, 4))
+print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
+print(decision_tree_confusion)
 
 
