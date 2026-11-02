@@ -15,6 +15,8 @@ from sklearn.metrics import (
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import LinearSVC
+from sklearn.calibration import CalibratedClassifierCV
 
 
 # Random seed for my project and test data is 20%
@@ -249,3 +251,34 @@ print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
 print(naive_bayes_confusion)
 
 
+# 5. Support Vector Machine
+svm_base_model = LinearSVC(max_iter=5000, random_state=RANDOM_STATE_VALUE)
+svm_model = CalibratedClassifierCV(svm_base_model, method="sigmoid", cv=3)
+
+# train the model
+svm_model.fit(X_train_prep, y_train)
+# predict class labels on test data
+svm_test_predictions = svm_model.predict(X_test_prep)
+# predict probabilities for target cancelled class
+svm_test_probabilities = svm_model.predict_proba(X_test_prep)[:, 1]
+
+
+# Evaluation metrics
+svm_accuracy = accuracy_score(y_test, svm_test_predictions)
+svm_auc = roc_auc_score(y_test, svm_test_probabilities)
+svm_precision = precision_score(y_test, svm_test_predictions, zero_division=0)
+svm_recall = recall_score(y_test, svm_test_predictions, zero_division=0)
+svm_f1 = f1_score(y_test, svm_test_predictions, zero_division=0)
+svm_mcc = matthews_corrcoef(y_test, svm_test_predictions)
+svm_confusion = confusion_matrix(y_test, svm_test_predictions)
+
+
+print("----- Support Vector Machine results -----")
+print("Accuracy :", round(svm_accuracy, 4))
+print("AUC      :", round(svm_auc, 4))
+print("Precision:", round(svm_precision, 4))
+print("Recall   :", round(svm_recall, 4))
+print("F1       :", round(svm_f1, 4))
+print("MCC      :", round(svm_mcc, 4))
+print("Confusion matrix [ [TN, FP], [FN, TP] ]:")
+print(svm_confusion)
