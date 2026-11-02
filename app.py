@@ -1,6 +1,7 @@
 from pathlib import Path
 import joblib
 import streamlit as st
+import pandas as pd
 
 
 # Directory of model details
@@ -59,4 +60,27 @@ if uploaded_file is None:
     st.info("Upload test_data.csv to see metrics")
     st.stop()
 
-    
+
+test_data = pd.read_csv(uploaded_file)
+
+feature = meta_info["feature"]
+target = meta_info["target"]
+class_names = meta_info["class_names"]
+encoding = meta_info["encoding"]
+
+missing_column = [column for column in feature + [target] if column not in test_data.columns]
+if missing_column:
+    st.error(f"Upload file is missing columns: {missing_column}")
+    st.stop()
+
+y_data = test_data[target].astype(str)
+
+unknown_labels = sorted(set(y_data.unique()) - set(class_names))
+if unknown_labels:
+    st.error(f"Unknown target labels {unknown_labels}. Allowed values: {class_names}")
+    st.stop()
+
+X_test = test_data[feature].copy()
+y_test = y_data.map(encoding)
+
+
