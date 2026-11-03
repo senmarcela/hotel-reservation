@@ -137,7 +137,7 @@ with left:
 
 # Display left column of screen with Classification report
 with right:
-    st.markdown("**classification report**")
+    st.markdown("**Classification report**")
     st.code(
         classification_report(
             y_test,
