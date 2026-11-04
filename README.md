@@ -11,6 +11,8 @@ This project uses the Hotel Reservations dataset, which contains 36,275 booking 
 
 The dataset contains 14 numerical features and 3 categorical features with no missing values. About 67.2% of the records belong to the Not_Canceled class and 32.8% belongs to Canceled class, making the dataset imbalanced. Since missing a cancellation is usually more costly than a false alarm, class distribution is an important consideration in model evaluation.
 
+Source: https://www.kaggle.com/datasets/ahsan81/hotel-reservations-classification-dataset
+
 
 ## c. Github Repository Link
 
